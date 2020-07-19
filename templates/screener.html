@@ -1,147 +1,75 @@
 {% extends 'base_template.html' %}
 {% block screener %}
-<div class="container" style="margin-top: 2%; margin-bottom: 5%;">
-  <ul class="list-unstyled card-columns" style="column-count: 2; margin-top: 5%; margin-left: 20%;">
-    {% for var1,var2 in data1 %}
-    <li><b>{{var1}}</b>{{ "&nbsp;"|safe*3 }}{{var2}} </li><br>
+<table class="table" style="width:30%; height:20% ; float: left; margin-left: 5%; margin-top: -5%;">
+  <thead>
+    <tr>
+      <th  colspan="2" style="text-align: center;">{{data[0][0]}}</th>
+    </tr>
+  </thead>
+  <tbody>
+   {% for keys,value in data[0][1].items() %}
+    <tr>
+      <td>{{keys}}</td>
+      <td>{{value}}</td>
+
+    </tr>
     {% endfor %}
-  </ul>
-</div>
+  </tbody>
+</table>
 
-     <h2>Peer comparison <span> <h4>Sector: Refineries // Industry: Refineries </h4> </span></h2>
-      <table class="table table-hover" style="margin-top: 2%;margin-bottom: 5%;">
-        <thead>
-          <tr>
-            <th scope="col">S.No.</th>
-            <th scope="col">Name</th>
-            <th scope="col">CMP Rs.</th>
-            <th scope="col">P/E</th>
-            <th scope="col">Mar Cap Rs.Cr.</th>
-            <th scope="col">Div Yid %</th>
-            <th scope="col">NP Qtr Rs.Cr.</th>
-            <th scope="col">Qtr Profit Var %</th>
-            <th scope="col">Sales Qtr Rs.Cr.</th>
-            <th scope="col">Qtr Sales Var %</th>
-            <th scope="col">ROCE %</th>
-            
+<table class="table" style="width:30%; height:20% ; float: right; margin-right: 5%; margin-top: -5%;">
+  <thead>
+    <tr>
+      <th  colspan="2" style="text-align: center;">{{data[1][0]}}</th>
+    </tr>
+  </thead>
+  <tbody>
+   {% for keys,value in data[1][1].items() %}
+    <tr>
+      <td>{{keys}}</td>
+      <td>{{value}}</td>
 
-          </tr>
-        </thead>
-        <tbody>
-          {% for int,val in peer %}
-          <tr>
-            <th scope="row">{{int}}</th>
-            {% for var in val %}
-            <td>{{var|trim}}</td>
-            {% endfor %}
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-      <h3>Sales is net of excise duty and discounts</h3>
-      <table  class="table table-borderless" style="margin-top: 2%; margin-bottom: 5%;" >
-        <thead>
-          <tr>
-            <th scope="col">Compounded Sales Growth</th>
-            <th scope="col">Compounded Profit Growth</th>
-            <th scope="col">Stock Price CAGR</th>
-            <th scope="col">Return on Equity</th>
-          </tr>
-        </thead>
-        <tbody>
-       <tr> 
-        {% for val1,val2 in compound %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
-          <td><b>{{ val1 }}</b>{{'&nbsp;'|safe*3}}{{ val2 }}</td>
-        
-          {% endfor %}
-        </tr>
-       
-        </tbody>
-    </table>
-        <h3> Cash Flows <span><h4>Consolidated Figures in Rs. Crores</h4></span></h3>
-        <table class="table" style="margin-top: 2%; margin-bottom: 5%;">
-            <thead>
-              <tr>
-                <th></th>
-                {% for val in cash_data[0] %}
-                <th>{{val}}</th>
-                {% endfor %}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th >Cash from Operating Activity</th>
-                {% for val in cash_data[1] %}
-                <td>{{val}}</td>
-                {% endfor %}
-              </tr>
-              <tr>
-                <th>Cash from Investing Activity</th>
-                {% for val in cash_data[2] %}
-                <td>{{val}}</td>
-                {% endfor %}
-              </tr>
-              <tr>
-                <th>Cash from Financing Activity</th>
-                {% for val in cash_data[3] %}
-                <td>{{val}}</td>
-                {% endfor %}
-              </tr>
-              <tr>
-                <th>Net Cash Flow</th>
-                {% for val in cash_data[4] %}
-                <td>{{val}}</td>
-                {% endfor %}
-              </tr>
-            </tbody>
-          </table>
+<table class="table" style="width:40%; height:20% ; float: left; margin-right: 5%; margin-top: 2%; ">
+  <thead>
+    <tr>
+      <th  colspan="4" style="text-align: center;">{{data[2][0]}}</th>
+    </tr>
+  </thead>
+  <tbody>
+   {% for keys,value in data[2][1].items() %}
+    <tr>
+      <td>{{keys}}</td>
+      <td>{{value[0]}}</td>
+      <td>{{value[1]}}</td>
+      <td>{{value[2]}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
-          <h3>Shareholding pattern<span> <h4>in percentages</h4></span></h3>
+<table class="table" style="width:40%; height:20% ; float:right; margin-right: 5%; margin-top: 2%; ">
+  <thead>
+    <tr>
+      <th  colspan="4" style="text-align: center;">{{data[3][0]}}</th>
+    </tr>
+  </thead>
+  <tbody>
+   {% for keys,value in data[3][1].items() %}
+    <tr>
+      <td>{{keys}}</td>
+      <td>{{value[0]}}</td>
+      <td>{{value[1]}}</td>
+      <td>{{value[2]}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
-          <table class="table"style="margin-top: 2%;">
-            <thead>
-              <tr>
-                <th></th>
-                {% for val in share[0] %}
-                <th scope="col">{{val}}</th>
-                {% endfor %}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Promoters</td>
-                {% for val in share[1] %}
-                <td>{{val}}</td>
-                {% endfor %}
-              </tr>
-              <tr>
-                <td>Flls</td>
-                {% for val in share[2] %}
-                <td>{{val}}</td>
-                {% endfor %}
-              </tr>
-              <tr>
-                <td>Dlls</td>
-                {% for val in share[3] %}
-                <td>{{val}}</td>
-                {% endfor %}
-              </tr>
-              <tr>
-                <td>Government</td>
-                {% for val in share[4] %}
-                <td>{{val}}</td>
-                {% endfor %}
-              </tr>
-
-              <tr>
-                <td>Public</td>
-                {% for val in share[5] %}
-                <td>{{val}}</td>
-                {% endfor %}
-              </tr>
-            </tbody>
-          </table>
 {% endblock %}
 
 
