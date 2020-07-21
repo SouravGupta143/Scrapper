@@ -2,7 +2,7 @@
 
 {% block news %}
 <nav class="navbar navbar-light bg-light" style="margin-top: -5%; float: right;">
-    <form class="form-inline"  method='POST' action='/part_cnbc_news/'>
+    <form class="form-inline"  method='POST' action='/part_money_news/'>
       <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search" aria-label="Search">
       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
@@ -10,7 +10,7 @@
   <table class="table " style="width:80%">
     <thead>
       <tr>
-        <th scope="col" style="text-align:center; padding-right: 20%;">CNBC</th>
+        <th scope="col" style="text-align:center; padding-right: 20%;">Money Control</th>
       </tr>
     </thead>
   </table>  
@@ -27,14 +27,14 @@
         {% for num,val in data %}
         <tr>
           <th scope="row">{{num}}</th>
-          {% if val[4] == 'negative' %}
+          {% if val[3] == 'negative' %}
                 <td><span class="border border-danger">{{val[1]}}</span></td>
-          {% elif val[4] == 'netural' %}
+          {% elif val[3] == 'netural' %}
                 <td><span class="border border-warning">{{val[1]}}</span></td>
           {% else %}
                 <td><span class="border border-success">{{val[1]}}</span></td>
           {% endif %}
-        <td style="width: 10%;"><a href={{val[3]}}>click here</a></td>
+        <td style="width: 10%;"><a href={{val[4]}}>click here</a></td>
         </tr>
         {% endfor %}
 
