@@ -326,6 +326,88 @@ def screener():
     # return render_template('screener.html',data1=orde,peer=enumerate(orde1,start=1),compound=data,cash_data=cash_flow_dic,
     #                         share=share_dic)
 
+@app.route('/trend_ac/', methods=['POST'])
+def trend():
+    if request.method=='POST':
+        text=request.form['search']
+        db,cur=connect('tsa')
+        cur.execute('SELECT * FROM companies WHERE title==?',(text,))
+        url_text=cur.fetchone()
+        db.close()
+        url=url_text[4]
+        req= Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        data= urlopen(req).read()
+        url_text=urlopen(req).read()
+        soup=BeautifulSoup(data,'lxml')
+        tables=soup.find_all('div',{'id':'datagrid'})
+        final_dic={}
+        val_list=[]
+        for th in tables[0].find_all('th'):
+            val_list.append(th.text.strip())
+        for val in tables[0].find_all('td'):
+            val_list.append(val.text.strip())
+        if len(val_list)==12:
+            dic={val_list[i]:val_list[i+1:i+6] for i in range(0,len(val_list),6)}
+        elif len(val_list)==14:
+            dic={val_list[i]:val_list[i+1:i+7] for i in range(0,len(val_list),7)}
+        elif len(val_list)==18:
+            dic={val_list[i]:val_list[i+1:i+9] for i in range(0,len(val_list),9)}
+            
+        final_dic['table']=dic
+
+
+        val_list=[]
+        h3=tables[1].find('h3').text.strip()
+        for val in tables[1].find_all('td'):
+            if len(val.attrs)!=0 :
+                if val.attrs['colspan']=='1':
+                    pass
+                else:
+                    val_list.append(val.text.strip())
+            else:
+                val_list.append(val.text.strip())
+        final_dic[h3]=val_list
+        for val in tables[2:20]:
+            val_list=[]
+            dic={}
+            h3=val.find('h3').text.strip()
+            for th in val.find_all('th'):
+                temp_td=val.find_all('td')
+                if len(temp_td[2].text.strip())==0 and (th.text.strip()=='%K'):
+                    pass
+                else:
+                    if th.find('a'):
+                        pass
+                    else:
+                        if (th.text.strip()=='View In Chart') :
+                            pass
+                        else:
+                            val_list.append(th.text.strip())
+            for td in val.find_all('td'):
+                if h3=='Volume Trend of S&P CNX NIFTY' and len(td.text.strip())==0:
+                    val_list.append(" ")
+                else:
+                    if len(td.text)==1:
+                        pass
+                    else:
+                        val_list.append(td.text.strip())
+                if len(val_list)==16:
+                    dic={val_list[i]:val_list[i+1:i+4] for i in range(0,16,4)}
+                if len(val_list)==20:
+                    dic={val_list[i]:val_list[i+1:i+5] for i in range(0,20,5)}
+                if len(val_list)==24:
+                    dic={val_list[i]:val_list[i+1:i+6] for i in range(0,24,6)}
+                if len(val_list)==32:
+                    dic={val_list[i]:val_list[i+1:i+4] for i in range(0,32,4)}
+                
+            final_dic[h3]=dic
+        i=1
+        data={}
+        for val in final_dic.items():
+            data[i]=val
+            i=i+1
+        
+    return render_template('comp_trend.html',data=data)
 
 def connect(dbname):
     try:
@@ -494,6 +576,9 @@ def receive_data():
 def fund_data():
     return render_template('fundamentals.html')
 
+@app.route('/trends/')
+def trend_data():
+    return render_template('trend.html')
 
 
 
