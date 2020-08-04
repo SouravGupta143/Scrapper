@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import numpy as np
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import pandas as pd
 
 new_words = {
     'rise':50,
@@ -580,6 +581,26 @@ def fund_data():
 def trend_data():
     return render_template('trend.html')
 
+@app.route('/export/')
+def export_lim():
+    df=pd.read_csv('https://www1.nseindia.com/corporates/datafiles/BM_All_Forthcoming.csv').iloc[:10,:]
+    data=list(df.values)
+    return render_template('export_lim.html',data=data)
+
+@app.route('/export_all/')
+def export():
+    df=pd.read_csv('https://www1.nseindia.com/corporates/datafiles/BM_All_Forthcoming.csv')
+    data=list(df.values)
+    return render_template('export_all.html',data=data)
+
+@app.route('/export_part/', methods=['POST'])
+def export_part():
+     if request.method == 'POST':
+        word=request.form['search']
+        df=pd.read_csv('https://www1.nseindia.com/corporates/datafiles/BM_All_Forthcoming.csv')
+        df=df[df['Company'].str.contains(word,case=False)]
+        data=list(df.values)
+        return render_template('part_export.html',data=data)
 
 
 if __name__ == "__main__":  
