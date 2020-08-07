@@ -206,7 +206,7 @@ def topstock():
             highlights=[]
             for val in final2:
                 highlights.append(val.text.strip())
-            return render_template('topstock.html',data1=final_dict, data2=final_dict1,highlight=highlights)
+            return render_template('topstock.html',data1=final_dict, data2=final_dict1,highlight=highlights[0:-1])
 
 @app.route('/fund_ac/', methods=['POST'])
 def screener():
@@ -353,6 +353,9 @@ def trend():
             dic={val_list[i]:val_list[i+1:i+7] for i in range(0,len(val_list),7)}
         elif len(val_list)==18:
             dic={val_list[i]:val_list[i+1:i+9] for i in range(0,len(val_list),9)}
+        elif len(val_list)==16:
+            dic={val_list[i]:val_list[i+1:i+8] for i in range(0,len(val_list),8)}
+
             
         final_dic['table']=dic
 
@@ -385,7 +388,7 @@ def trend():
                         else:
                             val_list.append(th.text.strip())
             for td in val.find_all('td'):
-                if h3=='Volume Trend of S&P CNX NIFTY' and len(td.text.strip())==0:
+                if ('Volume Trend' in h3) and len(td.text.strip())==0:
                     val_list.append(" ")
                 else:
                     if len(td.text)==1:
@@ -400,14 +403,14 @@ def trend():
                     dic={val_list[i]:val_list[i+1:i+6] for i in range(0,24,6)}
                 if len(val_list)==32:
                     dic={val_list[i]:val_list[i+1:i+4] for i in range(0,32,4)}
-                
+
             final_dic[h3]=dic
         i=1
         data={}
         for val in final_dic.items():
             data[i]=val
             i=i+1
-        
+                
     return render_template('comp_trend.html',data=data)
 
 def connect(dbname):
