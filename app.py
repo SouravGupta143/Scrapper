@@ -6,7 +6,13 @@ import numpy as np
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import pandas as pd
+from collections import Counter
+import plotly
+import plotly.express as px
+import json
 
+
+#new words in sentiments
 new_words = {
     'rise':50,
     'high':10,
@@ -33,11 +39,13 @@ vader.lexicon.update(new_words)
 
 app=Flask(__name__)
 
-
+#homepage
 @app.route('/')
 def index():
     return render_template('index.html')
     
+#add Nifty as a special page
+# show the main link of all the stocks of the topstock    
 @app.route('/topstock/', methods=['POST'])
 def topstock():
     if request.method=='POST':
@@ -208,6 +216,7 @@ def topstock():
                 highlights.append(val.text.strip())
             return render_template('topstock.html',data1=final_dict, data2=final_dict1,highlight=highlights[0:-1])
 
+#show the fundamentals link
 @app.route('/fund_ac/', methods=['POST'])
 def screener():
     if request.method=='POST':
@@ -327,6 +336,7 @@ def screener():
     # return render_template('screener.html',data1=orde,peer=enumerate(orde1,start=1),compound=data,cash_data=cash_flow_dic,
     #                         share=share_dic)
 
+#show the technicals links
 @app.route('/trend_ac/', methods=['POST'])
 def trend():
     if request.method=='POST':
@@ -371,6 +381,7 @@ def trend():
             else:
                 val_list.append(val.text.strip())
         final_dic[h3]=val_list
+        signals=[]
         for val in tables[2:20]:
             val_list=[]
             dic={}
@@ -395,14 +406,18 @@ def trend():
                         pass
                     else:
                         val_list.append(td.text.strip())
-                if len(val_list)==16:
-                    dic={val_list[i]:val_list[i+1:i+4] for i in range(0,16,4)}
-                if len(val_list)==20:
-                    dic={val_list[i]:val_list[i+1:i+5] for i in range(0,20,5)}
-                if len(val_list)==24:
-                    dic={val_list[i]:val_list[i+1:i+6] for i in range(0,24,6)}
-                if len(val_list)==32:
-                    dic={val_list[i]:val_list[i+1:i+4] for i in range(0,32,4)}
+            if len(val_list)==16:
+                dic={val_list[i]:val_list[i+1:i+4] for i in range(0,16,4)}
+            if len(val_list)==20:
+                dic={val_list[i]:val_list[i+1:i+5] for i in range(0,20,5)}
+            if len(val_list)==24:
+                dic={val_list[i]:val_list[i+1:i+6] for i in range(0,24,6)}
+            if len(val_list)==32:
+                dic={val_list[i]:val_list[i+1:i+4] for i in range(0,32,4)}
+            
+            sign=list(dic.values())
+            for val in sign[1:]:
+                signals.append(val[-1])
 
             final_dic[h3]=dic
         i=1
@@ -410,9 +425,18 @@ def trend():
         for val in final_dic.items():
             data[i]=val
             i=i+1
-                
-    return render_template('comp_trend.html',data=data)
+        
+        sig_count=Counter(signals[0:-13])
+        sig=dict(sig_count)
+        df=pd.DataFrame(sig.items(),columns=['Signals','Value'])
+        fig = px.bar(df, x="Signals", y="Value",color='Value',
+             barmode='group',
+             height=400,)  
+        plot=json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
+    return render_template('comp_trend.html',data=data,plot=plot)
+
+#connect to database
 def connect(dbname):
     try:
         db=sql.connect(f"{dbname}.db")
@@ -422,6 +446,7 @@ def connect(dbname):
         print("Error" ,e)
         exit(2)
 
+#fetch news from the cnbc and moneycontrol website
 def fetchnews(dbname):
     if dbname=='cnbctv18':
         db,cur=connect('cnbctv18')
@@ -498,8 +523,7 @@ def fetchnews(dbname):
         db.close()
 
 
-
-
+#Show the News
 @app.route('/news/')
 def news():
     fetchnews('cnbctv18')
@@ -584,6 +608,7 @@ def fund_data():
 def trend_data():
     return render_template('trend.html')
 
+# show the corporate csv file
 @app.route('/export/')
 def export_lim():
     df=pd.read_csv('https://www1.nseindia.com/corporates/datafiles/BM_All_Forthcoming.csv').iloc[:10,:]
@@ -604,6 +629,9 @@ def export_part():
         df=df[df['Company'].str.contains(word,case=False)]
         data=list(df.values)
         return render_template('part_export.html',data=data)
+
+
+#show the graph in corporate page
 
 
 if __name__ == "__main__":  

@@ -2,7 +2,18 @@
 
 {% block tsa %}
 
-          
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+<div class="shadow-lg p-3 mb-5 bg-white rounded" style="width: 80%; margin-left: 10%;">
+<div class="chart" id="bargraph">
+    <script>
+        var graphs = {{plot | safe}};
+        Plotly.plot('bargraph',graphs,{});
+    </script>
+</div>
+</div>
+      
             <table class="table table-bordered" style="width: 80%; margin-left: 10%;">
                 <tbody>
                   {% for keys,values in data[1][1].items() %}
@@ -433,5 +444,8 @@
 
               </tbody>
             </table>
+
+
+
 
 {% endblock %}
